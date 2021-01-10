@@ -46,5 +46,74 @@ cool stuff:
     intentionally only using like lame ASCII graphics
     
     the adversarial bit is sometimes collaborative
+   
+   === random code sorry == long story
+   
+ using DataFrames
+using Distances
+using Gadfly
+
+function get_how_many()
+    how_many = 100
+    return how_many
+end
+
+function get_near_portion()
+    return 0.2
+end
+
+function get_far_portion()
+    return 0.8
+end
+
+function get_Xs_Ys()
+    how_many = get_how_many()
+    Xs = rand(0:0.05:10, how_many)
+    Ys = rand(0:0.05:10, how_many)
+    return Xs, Ys
+end
+
+function build_a_circle()
+    Xs, Ys = get_Xs_Ys()
+    euclideans = []
+    for i in 1:length(Xs)
+        this_euclidean = euclidean(Xs[i], Ys[i])
+        push!(euclideans, this_euclidean)
+    end
+    gross_points_frame = DataFrame(x=Xs, y=Ys, dist=euclideans)
+
+    sorted_frame = sort!(gross_points_frame, [:dist])
+
+    near_portion = get_near_portion()
+    far_portion = get_far_portion()
+
+    Xs     = sorted_frame.x
+    Ys     = sorted_frame.y
+
+    sorted_points = [collect(point) for point in zip(Xs, Ys)]
+
+    near_point = trunc(Int64, near_portion*length(sorted_points))
+
+    far_point = trunc(Int64, far_portion*length(sorted_points))
+
+    keep_points = sorted_points[near_point:far_point]
+
+    keep_Xs = [point[1] for point in keep_points]
+    keep_Ys = [point[2] for point in keep_points]
+
+    points_frame = DataFrame(x=keep_Xs, y=keep_Ys)
+    return points_frame
+end
+
+function main()
+    points_frame = build_a_circle()
+    Xs     = points_frame.x
+    Ys     = points_frame.y
+    p      = plot(x=Xs, y=Ys, Geom.point)
+    display(p)
+end
+
+main()
+
     
     

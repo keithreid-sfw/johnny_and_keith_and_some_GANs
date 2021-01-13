@@ -115,5 +115,72 @@ end
 
 main()
 
+#=
+draw a line between two points
+=#
+
+using Plots
+using Test
+
+function get_entropic_magnitude()
+    entropic_magnitude           = 8
+    return entropic_magnitude
+end
+
+function get_span()
+    span::Int64                  = 32
+    return span
+end
+
+function get_line_granularity()
+    grain_size::Int64            = 32
+    line_granularity::Float64    = 1/grain_size 
+    return line_granularity
+end
+
+function make_a_line(A::Array{Float64, 1}, B::Array{Float64, 1})
+    
+    span                = get_span()
+    line_granularity    = get_line_granularity()
+    
+    Ax = A[1]
+    Ay = A[2]
+    Bx = B[1]
+    By = B[2]
+    
+    Xs = Ax:abs(Ax-Bx)*line_granularity:Bx
+    Ys = Ay:abs(Ay-By)*line_granularity:By
+    
+    points = [collect(point) for point in zip(Xs, Ys)]
+    
+    return points
+end
+
+function test_make_a_line()
+    A      = [  -7.0,  13.0]
+    B      = [ 24.0,  37.4]
+    points = make_a_line(A, B)
+    @test typeof(points) == Array{Array{Float64, 1}, 1}
+    @test points[1] == A
+    Xs = [point[1] for point in points]
+    Ys = [point[2] for point in points]
+    basic_line_plot = plot(Xs,Ys, seriestype = :scatter, legend=:false)
+    display(basic_line_plot)
+end
+test_make_a_line()
+
+function add_entropy(points::Array{Array{Float64,1},1})
+    entropic_magnitude  = get_entropic_magnitude()
+    line_granularity    = get_line_granularity()
+    random_Xs       = rand(-entropic_magnitude:0.1:entropic_magnitude, length(points))
+    random_Ys       = rand(-entropic_magnitude:0.1:entropic_magnitude, length(points))
+    Xs          = [point[1] for point in points]
+    Ys          = [point[2] for point in points]
+    entropic_Xs = .+(Xs, random_Xs)
+    entropic_Ys = .+(Ys, random_Ys)
+    entropic_line = [collect(point) for point in zip(entropic_Xs, entropic_Ys)]
+    return entropic_line
+end
+
     
     
